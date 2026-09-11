@@ -87,6 +87,7 @@ reading:
         article.md            # Markdown body + YAML frontmatter (source of truth)
         assets/<hash>.<ext>   # captured images, linked as assets/<file> from article.md
         highlights.md         # optional — the reading's saved highlights
+        position.md           # optional — where the user stopped reading
         original.html         # optional — raw HTML snapshot for re-processing
 ```
 

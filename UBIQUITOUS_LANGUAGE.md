@@ -18,7 +18,8 @@ host, macOS app, and landing page (`website`).
 - Use **article file** only when talking about the on-disk `article.md` inside a
   reading's folder.
 - Use **reading folder** for the per-reading folder `articles/<prefix>/<id>/`
-  that holds a reading's article file, its assets, and its highlights.
+  that holds a reading's article file, its assets, its highlights, and its
+  reading position.
 - Use **library** or **library folder** for the user-selected folder that holds
   readings and assets.
 - Use **index** for the local SQLite database. Do not call it the source of
@@ -45,8 +46,8 @@ host, macOS app, and landing page (`website`).
 | Library root | The absolute folder path selected on one device. Data stored inside the index must still use paths relative to this root. |
 | Save | The user action that adds the current page to the library as a new reading. Time-neutral: it covers both "read this later" and "keep this now that I've read it". |
 | Capture | The extension's extraction step that turns the live page into cleaned Markdown, metadata, and image bytes before the save is written. Internal/technical term; users just "save". |
-| Reading | One saved item in the user's library. A reading is backed by an article file, optional assets, and optional highlights — all inside its reading folder. |
-| Reading folder | The per-reading folder `articles/<prefix>/<id>/` (named by the reading id, under a two-character fan-out bucket) that holds the reading's `article.md`, its `assets/`, and its `highlights.md`. Moving or deleting a reading operates on this one folder. |
+| Reading | One saved item in the user's library. A reading is backed by an article file, optional assets, optional highlights, and an optional reading position — all inside its reading folder. |
+| Reading folder | The per-reading folder `articles/<prefix>/<id>/` (named by the reading id, under a two-character fan-out bucket) that holds the reading's `article.md`, its `assets/`, its `highlights.md`, and its `position.md`. Moving or deleting a reading operates on this one folder. |
 | Article file | The `article.md` file inside a reading folder (`articles/<prefix>/<id>/article.md`) that stores one reading's frontmatter and body. |
 | Frontmatter | YAML metadata at the top of an article file. It is the source of truth for reading metadata and state. |
 | Body | The cleaned Markdown content after frontmatter in an article file. |
@@ -71,6 +72,11 @@ host, macOS app, and landing page (`website`).
 | Archived | Boolean state meaning the reading is moved out of the active library list. Stored in frontmatter. |
 | Favorite | Boolean state meaning the user marked the reading as important or worth returning to. Stored in frontmatter. |
 | Rating | Integer star rating from 0 to 5, where 0 means unrated. Stored in frontmatter. |
+| Reading position | The point where the user stopped in a reading, so the reader can return to it. Stored in the reading's position file, never only in the index. |
+| Position file | The `position.md` file inside a reading folder (`articles/<prefix>/<id>/position.md`) that stores that reading's reading position. |
+| Anchor | The top-level block of the body Markdown that a reading position points at, named by its 0-based index plus a short quote of its start. |
+| Progress | The fraction of a reading before the anchor, from 0.0 to 1.0. The index caches it for the reading list; the position file is the source of truth. |
+| Resume | Opening a reading at its reading position instead of at the top. |
 | Tag | User-defined label stored in a reading's frontmatter. Tags organize readings and power tag filters. |
 | Smart view | Built-in sidebar filter derived from frontmatter fields. One is always active (`All` is the base); it composes with an optional tag filter and rating filter. |
 | Composed filter | The active view, tag, and rating (plus the search box) applied together as an intersection to scope the reading list and counts. At most one of each; a tag or rating toggles off when reselected. |
@@ -159,6 +165,8 @@ paragraphs, and the welcome article.
 | Star Ratings (section name) | Ratings | The sidebar section is "Ratings". "Star rating" is fine when describing the 0–5 value itself. |
 | Web reader | Reader | The macOS reader is native, not WebView-based. |
 | Add Link | Browser save or deferred in-app capture | In-app URL capture is not part of the current scope. |
+| Scroll position | Reading position | A height is not a stable position: it changes whenever the user changes the font, the text size, the width, or the line height. The reading position is anchored to a block of the body instead. |
+| Scroll offset | Anchor or progress | Same reason. An offset in points belongs to one rendering; the durable pair is the anchor (block index plus quote) and the progress fraction. |
 
 ## Flagged Ambiguities
 

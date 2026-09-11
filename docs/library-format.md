@@ -20,6 +20,7 @@ announce them in all three repos.
         assets/
           <sha256>.<ext>      # captured image, linked as assets/<file>
         highlights.md         # optional — the reading's saved highlights (§ Highlights)
+        position.md           # optional — where the user stopped reading (§ Reading position)
         original.html         # optional — raw HTML snapshot for future re-processing
 ```
 
@@ -161,6 +162,52 @@ are never mistaken for readings.
 
 ---
 
+## Reading position (`articles/<prefix>/<id>/position.md`)
+
+Where the user stopped in a reading lives in `position.md` inside the reading's folder — one file
+per reading, absent when the reading has no position. The file holds one record: the anchor quote as
+a Markdown block quote, then an HTML comment carrying the fields:
+
+```markdown
+> The first line of the paragraph where the user stopped.
+<!-- pos block=42 percent=0.63 at=2026-08-18T10:12:04.881Z -->
+```
+
+| Field | Type | Meaning |
+|-------|------|---------|
+| `block` | integer, 0-based | Index of the **anchor**: a top-level block of the body Markdown. |
+| `percent` | float, `0.0`–`1.0` | Progress before the anchor block. |
+| `at` | ISO-8601 UTC | When the position last changed; same format as `saved_at`. Informational. |
+| quote line | text | The start of the anchor block, on one line, at most 120 characters. |
+
+#### Rules
+
+- **Count blocks in the body Markdown source**, before any transform a client applies to render it.
+  Every client then arrives at the same index.
+- `percent` is the number of body characters before the anchor block divided by the number of body
+  characters in total, measured on the Markdown source — so every client computes the same value.
+- The quote keeps the file readable, and lets a client find the anchor again when the body changed.
+  Runs of whitespace collapse to a single space, so the quote is always one line.
+- **An absent file means "no position".** A damaged file also means "no position", and must never
+  stop a scan. A file is damaged when `block`, `percent`, or `at` is missing or unparsable, or when
+  the comment has no closing `-->` (which is how a half-synced file looks).
+- An **unknown field is ignored**, so a later version can add fields.
+- **Block 0 is the start of the article, which is the same as no position**: a writer deletes the
+  file rather than storing it. Marking a reading unread deletes it too.
+
+To restore a position, a client resolves in this order: the block index (checking that the quote
+agrees), then the quote found elsewhere in the body, then `percent`, and finally the start of the
+article.
+
+The scanner keys on the fixed `article.md` name, so `position.md` is never mistaken for a reading.
+An index may cache `percent` for the reading list, but the file remains the source of truth: a
+rebuild restores every position from the files.
+
+This file is an **addition**: `format_version` stays `1`, and a reader that does not know the file
+must ignore it.
+
+---
+
 ## ID scheme
 
 A **reading id** is **content-addressed**: the lowercase-hex SHA-256 of the reading's normalized
@@ -217,8 +264,10 @@ The macOS app's sidebar views are defined by frontmatter field values:
 ## Format versioning
 
 - `format_version` starts at `1`.
-- **Additive changes** (new optional frontmatter fields, new asset conventions) are backwards
-  compatible — do not bump the version.
+- **Additive changes** (new optional frontmatter fields, new asset conventions, a new optional file
+  in a reading folder such as `position.md`) are backwards compatible — do not bump the version. A
+  reader that does not know such a file must ignore it, and must leave it in place rather than
+  delete or rewrite it.
 - **Breaking changes** (renamed/removed required fields, changed semantics) bump the integer.
 - Readers must reject files with a `format_version` higher than the version they support, rather
   than silently misread them.
@@ -234,4 +283,5 @@ The macOS app's sidebar views are defined by frontmatter field values:
 | `articles/<prefix>/<id>/article.md` | SQLite index (`~/Library/Application Support/ReadControl/`) |
 | `articles/<prefix>/<id>/assets/*` | App preferences (theme, font, library path) |
 | `articles/<prefix>/<id>/highlights.md` | Native messaging host manifest |
+| `articles/<prefix>/<id>/position.md` | |
 | `articles/<prefix>/<id>/original.html` (optional) | |
