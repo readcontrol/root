@@ -157,6 +157,23 @@ A classic three-region macOS layout:
 - **Reader view:** the cleaned Markdown rendered with local assets and the user's chosen
   typography; actions to mark read/unread, favorite, archive, and edit tags.
 
+#### Reading-list row indicator
+
+The leading column of a row carries one indicator, so the title, site, and excerpt of every row
+line up in the same text column:
+
+| State | Indicator |
+|-------|-----------|
+| Unread, no reading position | A filled dot |
+| Unread, with a reading position | A ring filled to the progress |
+| Read | Nothing |
+
+Tokens: the column is **10 pt** wide; the dot is **7 pt**; the ring is **9 pt** across with a
+**1.5 pt** stroke, its arc in the accent color over a `quaternary` track, starting at the top and
+running clockwise. The ring's accessibility label reads the progress ("63 percent read"); the
+dot's reads "Unread". A reading that is read shows nothing, even when it still holds a position —
+the read state already says it is finished.
+
 ### Settings / appearance (popover from the gear)
 
 - **Appearance:** segmented **Light / Dark / System**.
