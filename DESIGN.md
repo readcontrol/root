@@ -375,6 +375,20 @@ and a divider set it off from the body. Clicking the current rating again clears
 unrated. The same footer is appended to the excerpt-only fallback path so unfetched readings can
 still be rated.
 
+### Resuming and finishing
+
+The reader **goes straight to where the user stopped** when it opens an article — there is no
+"Continue reading" control to press. The point is anchored to a block of the body rather than to a
+scroll height, so it survives a change of font, text size, measure, or leading: after such a
+change the anchor block is put back at the top of the window. An article with no stored position
+opens at the top, as does one the user has finished. The stored point lives in the library (see
+[`docs/library-format.md`](./docs/library-format.md)), not in the per-device index.
+
+Reaching the **end of the article marks it read** and clears the stored point, so the next open
+starts at the top. The end only counts once the user has actually scrolled: a short article that
+stands in the window from the first frame never marks itself read. An article that is already read
+is left alone, so its read date keeps the time the user first finished it.
+
 ### Text selection
 
 The reader supports **continuous, native selection** (drag, double/triple-click, ⌘C copy) across the
@@ -383,16 +397,16 @@ contiguous **headings and paragraphs are coalesced into one `NSAttributedString`
 read-only `NSTextView`** (`SelectableTextView`), with the theme's spacing re-expressed as
 `NSParagraphStyle` attributes. This stays within the no-WebView rule (it's AppKit/TextKit, not WebKit).
 
-- A run breaks — forming a **selection seam** — at any block that isn't a heading or text-only
-  paragraph: **images/figures, code blocks, tables, lists, and block quotes** each keep their richer
-  SwiftUI renderer.
+- A run coalesces **headings, text-only paragraphs, and image-free lists and block quotes**, whose
+  attributed layout (marker tab stops, hanging indents, quote bars via `ReaderLayoutManager`) is
+  expressed in `MarkdownTextRun`.
+- A run breaks — forming a **selection seam** — at any block that carries an image (a figure, or a
+  list/quote whose subtree holds one), and at every other block: **code blocks, tables, thematic
+  breaks, raw HTML**. Each of those keeps its richer SwiftUI renderer.
+  `ArticleDocument.isFoldable` is the single source of truth for the split.
 - Run height is driven by the text view's `intrinsicContentSize` (invalidated whenever the text or
   width changes), **not** `sizeThatFits` — the latter can run before the text is installed on the
   first layout pass, measuring an empty view and collapsing the run to zero height (a blank reader).
-- Lists and block quotes are deliberately *not* folded into the text run for now. Their attributed
-  layout (marker tab stops, hanging indents, quote bars via `ReaderLayoutManager`) is implemented in
-  `MarkdownTextRun` but unvalidated on-device, so they stay on the proven SwiftUI path and form a
-  seam. Re-enabling is a matter of flipping `isFoldable`.
 - ⌘F find-bar isn't offered per run (a standalone `NSTextView` needs an enclosing scroll view for
   it); selection and copy are unaffected.
 
@@ -486,4 +500,5 @@ first load — pick a default row).
   [Color palette](#color-palette-shared-across-the-whole-ecosystem); the accent is a dark ink pill.
 - **Archive vs All** semantics (does "All" include archived?) — the assumption above pending
   confirmation.
-- List-row density and exactly which indicators/metadata appear inline.
+- List-row density, and which metadata appears inline (site, reading time, excerpt). The **leading
+  indicator** is settled — see [Reading-list row indicator](#reading-list-row-indicator).

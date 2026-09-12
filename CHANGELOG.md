@@ -20,6 +20,16 @@ and versions track the app's `CFBundleShortVersionString`. See
 - Both are also adjustable from the appearance popover at the bottom of the
   sidebar, without opening Settings: two icon-capped sliders matching the
   font-size slider already there.
+- The reader now **remembers where you stopped** and opens an article at that
+  paragraph. The point is anchored to a block of the article, not to a scroll
+  height, so it holds after you change the font, size, width, or line height.
+  It is stored beside the article in your library, so it travels with your
+  files to your other devices.
+- The reading list shows **how far you got**: an unread article you have
+  started shows a ring filled to your progress in place of the unread dot.
+- Reaching the **end of an article marks it read** and clears the saved point.
+  A short article that fits on screen is never marked read on its own — you
+  have to scroll it.
 
 ### Changed
 
