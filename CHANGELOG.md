@@ -25,9 +25,8 @@ and versions track the app's `CFBundleShortVersionString`. See
   height, so it holds after you change the font, size, width, or line height.
   It is stored beside the article in your library, so it travels with your
   files to your other devices.
-- The reading list shows **how far you got**: an unread article you have
-  started shows a ring filled to your progress in place of the unread dot.
 - Reaching the **end of an article marks it read** and clears the saved point.
+  The article stays open, even in the Unread view, where its row leaves the list.
   A short article that fits on screen is never marked read on its own — you
   have to scroll it.
 
