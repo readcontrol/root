@@ -29,6 +29,10 @@ and versions track the app's `CFBundleShortVersionString`. See
   The article stays open, even in the Unread view, where its row leaves the list.
   A short article that fits on screen is never marked read on its own — you
   have to scroll it.
+- Reopening the app **opens the article you were reading**, even when the list
+  doesn't show it — it is further down than the first page, or outside the
+  view you reopen on. If that article was deleted, the app opens the first one
+  in the list, as before.
 
 ### Changed
 
