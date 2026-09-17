@@ -170,13 +170,14 @@ a Markdown block quote, then an HTML comment carrying the fields:
 
 ```markdown
 > The first line of the paragraph where the user stopped.
-<!-- pos block=42 percent=0.63 at=2026-08-18T10:12:04.881Z -->
+<!-- pos block=42 percent=0.63 offset=0.4 at=2026-08-18T10:12:04.881Z -->
 ```
 
 | Field | Type | Meaning |
 |-------|------|---------|
 | `block` | integer, 0-based | Index of the **anchor**: a top-level block of the body Markdown. |
 | `percent` | float, `0.0`–`1.0` | Progress before the anchor block. |
+| `offset` | float, `0.0`–`1.0`, optional | How far into the anchor block the stop is (`0.0` is the block's top). Absent means `0.0`. |
 | `at` | ISO-8601 UTC | When the position last changed; same format as `saved_at`. Informational. |
 | quote line | text | The start of the anchor block, on one line, at most 120 characters. |
 
@@ -186,6 +187,11 @@ a Markdown block quote, then an HTML comment carrying the fields:
   Every client then arrives at the same index.
 - `percent` is the number of body characters before the anchor block divided by the number of body
   characters in total, measured on the Markdown source — so every client computes the same value.
+- `offset` is how far into the anchor block the stop is, as a fraction of the block, so a client
+  restoring a position lands *inside* a tall block (a figure, a long quote) and not at its top. It
+  is a rendered, best-effort hint — clients may render a block at different heights — so it never
+  changes which block the anchor names, only where inside it the reader lands. A client that does
+  not understand the field lands at the top of the block (`offset` = `0.0`).
 - The quote keeps the file readable, and lets a client find the anchor again when the body changed.
   Runs of whitespace collapse to a single space, so the quote is always one line.
 - **An absent file means "no position".** A damaged file also means "no position", and must never
@@ -195,9 +201,9 @@ a Markdown block quote, then an HTML comment carrying the fields:
 - **Block 0 is the start of the article, which is the same as no position**: a writer deletes the
   file rather than storing it. Marking a reading unread deletes it too.
 
-To restore a position, a client resolves in this order: the block index (checking that the quote
-agrees), then the quote found elsewhere in the body, then `percent`, and finally the start of the
-article.
+To restore a position, a client resolves the anchor block in this order: the block index (checking
+that the quote agrees), then the quote found elsewhere in the body, then `percent`, and finally the
+start of the article. Once it has the block, it applies `offset` to land inside it.
 
 The scanner keys on the fixed `article.md` name, so `position.md` is never mistaken for a reading.
 An index may cache `percent` for the reading list, but the file remains the source of truth: a

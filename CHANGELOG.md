@@ -5,6 +5,16 @@ here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 and versions track the app's `CFBundleShortVersionString`. See
 [RELEASE.md](./RELEASE.md) for how a release is cut.
 
+## [Unreleased]
+
+### Fixed
+
+- Reopening an article now returns to the exact spot you stopped at, even when
+  that spot is inside a tall block such as an image or a long quotation. The
+  saved point previously snapped to the top of the block, so coming back to a
+  reading with a figure or a quote could jump by a screenful. The point now also
+  records how far into the block you were, beside the article in your library.
+
 ## 0.3.0 - 2026-09-16
 
 ### Added
