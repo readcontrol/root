@@ -5,7 +5,7 @@ here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 and versions track the app's `CFBundleShortVersionString`. See
 [RELEASE.md](./RELEASE.md) for how a release is cut.
 
-## [Unreleased]
+## 0.3.1 - 2026-09-17
 
 ### Fixed
 
